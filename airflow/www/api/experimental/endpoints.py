@@ -26,6 +26,7 @@ from airflow.api.common.experimental import pool as pool_api
 from airflow.api.common.experimental import trigger_dag as trigger
 from airflow.api.common.experimental.get_task import get_task
 from airflow.api.common.experimental.get_task_instance import get_task_instance
+from airflow.api.common.experimental.add_update_dag import update_add_dag_from_payload
 from airflow.exceptions import AirflowException
 from airflow.utils import timezone
 from airflow.utils.log.logging_mixin import LoggingMixin
@@ -205,6 +206,28 @@ def get_pool(name):
         return response
     else:
         return jsonify(pool.to_json())
+
+
+def my_auth_function(api_token=None):
+    return False
+
+@csrf.exempt#add token so that build scripts can post to this for dag updates
+@api_experimental.route('/add_update_dag_file/<string:file_name>', methods=['POST'])
+@requires_authentication
+def add_update_dag(file_name):
+    file_payload = request.get_data(as_text=True)
+    print(str(file_payload))
+    try:
+        result_dict = {"result": "Success", "dag_id": file_name}
+        dag_file_location = update_add_dag_from_payload(file_name=file_name, file_payload=str(file_payload))
+        result_dict["file"] = dag_file_location
+        result_dict["payload"] = file_payload
+        return jsonify(result_dict)
+    except AirflowException as err:
+        _log.error(err)
+        response = jsonify(error="{}".format(err))
+        response.status_code = err.status_code
+        return response
 
 
 @api_experimental.route('/pools', methods=['GET'])
