@@ -36,6 +36,10 @@ class Client(object):
         """
         raise NotImplementedError()
 
+    def add_dag(self):
+        """Add a dag to Airflow"""
+        raise NotImplementedError()
+
     def delete_dag(self, dag_id):
         """Delete all DB records related to the specified dag.
 

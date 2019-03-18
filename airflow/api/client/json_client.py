@@ -55,6 +55,12 @@ class Client(api_client.Client):
                              })
         return data['message']
 
+    def add_dag(self):
+        endpoint = '/api/experimental/silly'
+        url = urljoin(self._api_base_url, endpoint)
+        self._request(url)
+        return "MY ENDPOINT"
+
     def delete_dag(self, dag_id):
         endpoint = '/api/experimental/dags/{}/delete_dag'.format(dag_id)
         url = urljoin(self._api_base_url, endpoint)
